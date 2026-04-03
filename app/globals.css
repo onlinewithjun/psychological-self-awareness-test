@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f2f5f8;
+  --foreground: #172032;
+  --foreground-soft: #23324c;
+  --muted-foreground: #5f6f87;
+  --panel: rgba(255, 255, 255, 0.76);
+  --paper: #ffffff;
+  --stroke: rgba(109, 128, 155, 0.22);
+  --accent: #6f8fb7;
+  --accent-soft: #9fb7d4;
+  --ring: rgba(111, 143, 183, 0.55);
+  --font-sans-stack:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI",
+    "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC",
+    "Helvetica Neue", Arial, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-foreground-soft: var(--foreground-soft);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-panel: var(--panel);
+  --color-paper: var(--paper);
+  --color-stroke: var(--stroke);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --font-sans: var(--font-sans-stack);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans-stack);
+}
+
+body {
+  min-width: 320px;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(157, 182, 212, 0.36);
+}
+
+a,
+button,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.container-shell {
+  @apply mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8;
+}
+
+.section-space {
+  @apply py-14 sm:py-16 lg:py-20;
+}
+
+.hairline {
+  box-shadow: inset 0 0 0 1px rgba(109, 128, 155, 0.12);
+}
+
+.animate-rise {
+  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

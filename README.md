@@ -1,36 +1,153 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 向度
 
-## Getting Started
+一个研究导向、反标签化、强调解释与安全边界的心理自我认知 Web MVP。
 
-First, run the development server:
+它不是星座站、MBTI 换皮站，也不是诊断工具。它尝试做的是一件更克制的事：用多维度、可解释、可控生成的方式，帮助用户理解自己当前在情绪、压力、关系、边界、行动与觉察上的倾向组合。
+
+## 产品定位
+
+- 用途：自我认知与心理教育
+- 不做：医疗诊断、心理治疗替代品、危机干预渠道、娱乐人格分类器
+- 核心理念：
+  - 不把人压缩成一个人格标签
+  - 不输出本质化、宿命化判断
+  - 强调当前倾向、情境差异和组合模式
+  - 结果解释采用结构化评分 + 模板化解释 + 组合规则
+  - 内置风险词识别与危机优先提醒
+
+## 当前 MVP 功能
+
+- 首页
+- 关于与免责声明页
+- 测试介绍页
+- 开始测试页
+- 测试进行页（32 题、带进度条、单题聚焦）
+- 结果页（总览摘要、组合解读、情境建议、图表）
+- 报告详情页（维度解释、温和提醒、方法说明）
+- 本机历史页（匿名保存、最近结果对比）
+- 危机提示页（风险词触发后优先展示）
+
+## 测评方法概览
+
+- 总题量：32 题
+- 量表：1-5 Likert
+- 维度：
+  - 情绪稳定与波动倾向
+  - 压力反应模式
+  - 人际关系与依恋倾向
+  - 自我价值感与自我评价方式
+  - 决策风格
+  - 边界感与表达倾向
+  - 行动力与拖延倾向
+  - 自我觉察能力
+- 评分逻辑：
+  - 每题按 1-5 分回答
+  - 反向题做方向转换
+  - 每个维度换算为 0-100 分
+  - 报告输出不是好坏等级，而是更靠近哪一侧的倾向
+
+## 安全与伦理边界
+
+- 本工具仅用于自我认知与心理教育
+- 不构成医学诊断、心理治疗或专业意见
+- 不输出精神障碍、人格障碍等确诊式判断
+- 若用户填写内容中包含高风险表达，系统不继续普通测试结论，转为展示支持提示页
+- 风险词示例：`自伤`、`自杀`、`想死`、`活不下去`、`伤害自己`、`kill myself` 等
+
+## 技术栈
+
+- Next.js 16（App Router）
+- TypeScript
+- Tailwind CSS 4
+- shadcn/ui 风格组件模式（基于 `class-variance-authority`、`@radix-ui/*`、`tailwind-merge`）
+- Recharts
+- 本地存储：`localStorage`
+
+说明：当前 MVP 以匿名本机存储为主，没有引入数据库。后续如需多端同步、后台管理或数据统计，可扩展 Prisma + SQLite / PostgreSQL。
+
+## 本地启动
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+默认开发地址：
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 生产构建
 
-## Learn More
+```bash
+npm run build
+npm run start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 目录结构
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+app/
+  about/                  关于与免责声明
+  assessment/             测试介绍、开始、问卷
+  history/                本机历史页
+  report/[sessionId]/     详细报告页
+  results/[sessionId]/    结果总览页
+  support/                危机提示页
+components/
+  assessment/             问卷、结果、图表、历史等业务组件
+  site/                   头部、页脚、区块标题
+  ui/                     Button / Card / Tabs / Accordion / Progress 等基础组件
+data/
+  assessment.ts           维度定义、题库、Likert 配置
+lib/
+  scoring.ts              评分与报告生成逻辑
+  risk.ts                 风险词识别
+  storage.ts              本机草稿与历史存储
+  types.ts                领域模型定义
+  utils.ts                通用工具函数
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 报告生成策略
 
-## Deploy on Vercel
+项目没有把解释完全交给自由发挥的模型。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+当前策略是：
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. 结构化题库与维度定义
+2. 维度分数计算
+3. 分数映射到低 / 中段 / 高侧模板
+4. 组合规则触发组合解读
+5. 基于维度组合生成情境建议与温和提醒
+
+这样做的目的，是尽量减少以下风险：
+
+- 凭空脑补用户经历
+- 输出绝对化人格判断
+- 夸大“神准感”
+- 把测评误导成诊断结果
+
+## 设计系统摘要
+
+- 风格：极简、安静、克制、内容优先
+- 策略：mobile-first
+- 视觉：低饱和浅灰蓝底、轻边框、轻阴影、自然圆角
+- 交互：单题聚焦、轻动效、清晰进度、不制造考试感
+- 图表：只作为辅助阅读，不作为视觉噱头
+
+## 后续可扩展方向
+
+- Prisma + SQLite / PostgreSQL 数据层
+- 用户登录与跨设备同步
+- 题库管理与维度配置后台
+- 报告模板管理
+- 风险规则管理
+- 数据统计看板
+- PDF 导出优化
+- 多语言支持
+- 更细的时间序列对比与趋势观察
+
+## 重要提醒
+
+如果用户存在明显情绪危机、自伤或自杀想法、伤害他人的冲动，或已经出现严重生活功能受损，这个项目不应被当作主要帮助来源。更合适的下一步，是尽快联系当地紧急援助、最近的医疗机构、可信任的人或专业支持。
