@@ -219,7 +219,11 @@ export function ResultsSummary({ sessionId }: { sessionId: string }) {
         </section>
 
         {figureReferences.length > 0 ? (
-          <FigureReferences figures={figureReferences} compact />
+          <FigureReferences
+            figures={figureReferences}
+            category={report.figureCategory ?? session.figureCategory ?? "all"}
+            compact
+          />
         ) : null}
 
         {deepInsights.length > 0 || growthPlan.length > 0 ? (

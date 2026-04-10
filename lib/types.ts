@@ -88,6 +88,13 @@ export type ContextSuggestion = {
   content: string;
 };
 
+export type FigureCategory =
+  | "all"
+  | "nba-stars"
+  | "kpop-stars"
+  | "ancient-chinese"
+  | "scientists";
+
 export type HistoricalFigure = {
   id: string;
   name: string;
@@ -96,6 +103,7 @@ export type HistoricalFigure = {
   role: string;
   summary: string;
   resonance: string;
+  category?: Exclude<FigureCategory, "all">;
   imagePath: string;
   imageAlt: string;
   imageFit?: "cover" | "contain";
@@ -172,6 +180,7 @@ export type AssessmentReport = {
   generatedAt: string;
   overallSummary: string;
   storyOutcome?: StoryOutcome;
+  figureCategory?: FigureCategory;
   dimensions: ScoredDimension[];
   combinations: CombinationInsight[];
   contexts: ContextSuggestion[];
@@ -191,6 +200,7 @@ export type SessionRecord = {
   createdAt: string;
   mode?: "survey" | "story";
   note: string;
+  figureCategory?: FigureCategory;
   answers: AnswerMap;
   report: AssessmentReport;
 };
@@ -199,6 +209,7 @@ export type AssessmentDraft = {
   id: string;
   createdAt: string;
   note: string;
+  figureCategory: FigureCategory;
   answers: AnswerMap;
   questionIndex: number;
 };
@@ -207,6 +218,7 @@ export type StoryDraft = {
   id: string;
   createdAt: string;
   note: string;
+  figureCategory: FigureCategory;
   sceneIndex: number;
   dimensionScores: Record<DimensionId, number>;
   selectedChoiceIds: string[];

@@ -10,9 +10,11 @@ import {
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowRight, NotebookPen } from "lucide-react";
 
+import { figureCategoryOptions } from "@/data/figures";
 import { makeInitialAssessmentDraft } from "@/lib/assessment-engine";
 import { detectHighRiskExpression } from "@/lib/risk";
 import { makeInitialStoryDraft } from "@/lib/story-engine";
+import type { FigureCategory } from "@/lib/types";
 import {
   loadDraft,
   loadStoryDraft,
@@ -34,6 +36,7 @@ export function IntakeForm() {
   const [note, setNote] = useState("");
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
+  const [figureCategory, setFigureCategory] = useState<FigureCategory>("nba-stars");
   const [isPending, startTransition] = useTransition();
   const hasHydrated = useSyncExternalStore(
     () => () => {},
@@ -81,7 +84,7 @@ export function IntakeForm() {
       return;
     }
 
-    const nextDraft = makeInitialStoryDraft(note.trim());
+    const nextDraft = makeInitialStoryDraft(note.trim(), figureCategory);
     saveStoryDraft(nextDraft);
 
     startTransition(() => {
@@ -109,7 +112,7 @@ export function IntakeForm() {
       return;
     }
 
-    const nextDraft = makeInitialAssessmentDraft(note.trim());
+    const nextDraft = makeInitialAssessmentDraft(note.trim(), figureCategory);
     saveDraft(nextDraft);
 
     startTransition(() => {
@@ -203,6 +206,36 @@ export function IntakeForm() {
               placeholder="例如：最近我常在忙乱里把自己顶得很紧，也会在关系里优先照顾别人，想更清楚地知道自己到底在怎样运作。"
             />
           </label>
+
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-foreground">人物相似测试分类</p>
+              <p className="text-sm leading-7 text-muted-foreground">
+                你可以让系统从某一类人物里，只匹配 1 个与你当前状态更接近的参考对象；不限定时，会继续使用通用人物库。
+              </p>
+            </div>
+
+            <div className="grid gap-3">
+              {figureCategoryOptions.map((option) => {
+                const checked = figureCategory === option.id;
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setFigureCategory(option.id)}
+                    className={`rounded-[24px] border px-4 py-4 text-left transition-all ${
+                      checked
+                        ? "border-[rgba(111,143,183,0.42)] bg-white shadow-[0_18px_50px_-34px_rgba(51,74,114,0.44)]"
+                        : "border-stroke bg-white/65 hover:bg-white/85"
+                    }`}
+                  >
+                    <p className="text-sm font-medium text-foreground">{option.label}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {riskResult.hasHighRisk ? (
             <div className="rounded-[24px] border border-[rgba(188,110,110,0.28)] bg-[rgba(255,244,244,0.88)] p-4 text-sm leading-7 text-[rgb(122,76,76)]">

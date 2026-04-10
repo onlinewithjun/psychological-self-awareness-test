@@ -225,7 +225,12 @@ export function ReportDetails({ sessionId }: { sessionId: string }) {
           </Card>
         </section>
 
-        {figureReferences.length > 0 ? <FigureReferences figures={figureReferences} /> : null}
+        {figureReferences.length > 0 ? (
+          <FigureReferences
+            figures={figureReferences}
+            category={report.figureCategory ?? session.figureCategory ?? "all"}
+          />
+        ) : null}
 
         {deepInsights.length > 0 ? (
           <section className="space-y-4">

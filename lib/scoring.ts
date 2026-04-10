@@ -9,6 +9,7 @@ import {
   type DeepInsight,
   type DimensionBand,
   type DimensionId,
+  type FigureCategory,
   type GrowthPlanStep,
   type MatchedFigure,
   type PoleSide,
@@ -666,8 +667,14 @@ function buildReflectionPrompts(
 
 function buildFigureReferences(
   lookup: Record<DimensionId, ScoredDimension>,
+  figureCategory: FigureCategory = "all",
 ): MatchedFigure[] {
-  return historicalFigures
+  const candidateFigures =
+    figureCategory === "all"
+      ? historicalFigures
+      : historicalFigures.filter((figure) => figure.category === figureCategory);
+
+  const rankedFigures = candidateFigures
     .map((figure) => {
       const totalDistance = dimensionOrder.reduce((sum, dimensionId) => {
         return sum + Math.abs(lookup[dimensionId].score - figure.scores[dimensionId]);
@@ -700,8 +707,13 @@ function buildFigureReferences(
         matchHighlights: closestDimensions,
       };
     })
-    .sort((a, b) => b.matchScore - a.matchScore)
-    .slice(0, 2);
+    .sort((a, b) => b.matchScore - a.matchScore);
+
+  if (rankedFigures.length === 0) {
+    return [];
+  }
+
+  return rankedFigures.slice(0, figureCategory === "all" ? 2 : 1);
 }
 
 function buildStoryOutcome(
@@ -734,6 +746,7 @@ function buildReportFromDimensions(
   dimensionsScored: ScoredDimension[],
   options?: {
     storyOutcome?: StoryOutcome;
+    figureCategory?: FigureCategory;
   },
 ): AssessmentReport {
   const lookup = Object.fromEntries(
@@ -744,10 +757,11 @@ function buildReportFromDimensions(
     generatedAt: new Date().toISOString(),
     overallSummary: buildOverallSummary(dimensionsScored),
     storyOutcome: options?.storyOutcome,
+    figureCategory: options?.figureCategory ?? "all",
     dimensions: dimensionsScored,
     combinations: buildCombinationInsights(lookup),
     contexts: buildContextSuggestions(lookup),
-    figureReferences: buildFigureReferences(lookup),
+    figureReferences: buildFigureReferences(lookup, options?.figureCategory ?? "all"),
     deepInsights: buildDeepInsights(lookup),
     growthPlan: buildGrowthPlan(lookup),
     reflectionPrompts: buildReflectionPrompts(lookup),
@@ -759,16 +773,26 @@ function buildReportFromDimensions(
   };
 }
 
-export function generateAssessmentReport(answers: AnswerMap): AssessmentReport {
+export function generateAssessmentReport(
+  answers: AnswerMap,
+  options?: {
+    figureCategory?: FigureCategory;
+  },
+): AssessmentReport {
   const dimensionsScored = dimensionOrder.map((dimensionId) =>
     scoreDimension(dimensionId, answers),
   );
 
-  return buildReportFromDimensions(dimensionsScored);
+  return buildReportFromDimensions(dimensionsScored, {
+    figureCategory: options?.figureCategory ?? "all",
+  });
 }
 
 export function generateAssessmentReportFromDimensionScores(
   dimensionScores: Record<DimensionId, number>,
+  options?: {
+    figureCategory?: FigureCategory;
+  },
 ): AssessmentReport {
   const dimensionsScored = dimensionOrder.map((dimensionId) =>
     scoreDimensionFromScore(dimensionId, dimensionScores[dimensionId]),
@@ -780,5 +804,6 @@ export function generateAssessmentReportFromDimensionScores(
 
   return buildReportFromDimensions(dimensionsScored, {
     storyOutcome: buildStoryOutcome(lookup),
+    figureCategory: options?.figureCategory ?? "all",
   });
 }

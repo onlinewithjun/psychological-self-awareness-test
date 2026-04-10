@@ -1,5 +1,10 @@
 import { initialStoryScores, storyScenes } from "@/data/story";
-import type { DimensionId, StoryChoice, StoryDraft } from "@/lib/types";
+import type {
+  DimensionId,
+  FigureCategory,
+  StoryChoice,
+  StoryDraft,
+} from "@/lib/types";
 
 const storyChoiceMap = new Map<string, StoryChoice>(
   storyScenes.flatMap((scene) => scene.choices.map((choice) => [choice.id, choice])),
@@ -35,11 +40,15 @@ export function calculateStoryScores(
   return scores;
 }
 
-export function makeInitialStoryDraft(note = ""): StoryDraft {
+export function makeInitialStoryDraft(
+  note = "",
+  figureCategory: FigureCategory = "all",
+): StoryDraft {
   return {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     note,
+    figureCategory,
     sceneIndex: 0,
     dimensionScores: { ...initialStoryScores },
     selectedChoiceIds: [],

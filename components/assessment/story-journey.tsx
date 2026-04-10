@@ -149,6 +149,9 @@ export function StoryJourney() {
       setIsCompleting(true);
       const report = generateAssessmentReportFromDimensionScores(
         activeDraft.dimensionScores,
+        {
+          figureCategory: activeDraft.figureCategory ?? "all",
+        },
       );
 
       storeSession({
@@ -156,6 +159,7 @@ export function StoryJourney() {
         createdAt: new Date().toISOString(),
         mode: "story",
         note: activeDraft.note,
+        figureCategory: activeDraft.figureCategory ?? "all",
         answers: {},
         report,
       });

@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { getFigureCategoryMeta } from "@/data/figures";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -9,23 +10,34 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { MatchedFigure } from "@/lib/types";
+import type { FigureCategory } from "@/lib/types";
 
 export function FigureReferences({
   figures,
+  category = "all",
   compact = false,
 }: {
   figures: MatchedFigure[];
+  category?: FigureCategory;
   compact?: boolean;
 }) {
+  const categoryMeta = getFigureCategoryMeta(category);
+  const isCategoryMode = category !== "all";
+
   return (
     <Card>
       <CardHeader>
         <div className="flex flex-wrap items-center gap-3">
-          <CardTitle>可能产生共鸣的参考人物</CardTitle>
+          <CardTitle>
+            {isCategoryMode ? "与你更接近的参考人物" : "可能产生共鸣的参考人物"}
+          </CardTitle>
           <Badge>仅作类比，不作等同判断</Badge>
+          {isCategoryMode ? <Badge>{categoryMeta.label}</Badge> : null}
         </div>
         <CardDescription>
-          这部分不是在说“你就是这些名人”。它只是从更大的候选人物库里，挑出与你当前模式更容易产生共鸣的 2 个参考点，帮助你更立体地理解自己。
+          {isCategoryMode
+            ? `你这次选择了「${categoryMeta.label}」作为参照范围。系统会只在这一类人物里，匹配 1 个与你当前模式最接近的参考对象。`
+            : "这部分不是在说“你就是这些名人”。它只是从更大的候选人物库里，挑出与你当前模式更容易产生共鸣的 2 个参考点，帮助你更立体地理解自己。"}
         </CardDescription>
       </CardHeader>
       <CardContent className={`grid gap-4 ${compact ? "xl:grid-cols-2" : "lg:grid-cols-2"}`}>

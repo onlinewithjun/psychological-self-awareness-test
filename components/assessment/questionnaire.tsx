@@ -20,7 +20,7 @@ import {
   storeSession,
   subscribeToStorage,
 } from "@/lib/storage";
-import type { AnswerMap } from "@/lib/types";
+import type { AnswerMap, FigureCategory } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -29,6 +29,7 @@ type DraftState = {
   id: string;
   createdAt: string;
   note: string;
+  figureCategory: FigureCategory;
   answers: AnswerMap;
   questionIndex: number;
 };
@@ -113,7 +114,9 @@ export function Questionnaire() {
     }
 
     if (activeDraft.questionIndex === questions.length - 1) {
-      const report = generateAssessmentReport(activeDraft.answers);
+      const report = generateAssessmentReport(activeDraft.answers, {
+        figureCategory: activeDraft.figureCategory ?? "all",
+      });
       const sessionId = activeDraft.id;
       setIsCompleting(true);
 
@@ -122,6 +125,7 @@ export function Questionnaire() {
         createdAt: new Date().toISOString(),
         mode: "survey",
         note: activeDraft.note,
+        figureCategory: activeDraft.figureCategory ?? "all",
         answers: activeDraft.answers,
         report,
       });
